@@ -20,20 +20,28 @@ wss.on('connection', function connection(ws) {
         console.log('new game!');
         const gameId = gameServer.newGame();
         response = { resp: 'newGame', id: gameId };
+        ws.send(JSON.stringify(response));
+        break;
+
+      case "joinGame":
+        console.log('join game');
+        response = gameServer.joinGame(msg.gameId, msg.playerName, ws);
+        ws.send(JSON.stringify(response));
         break;
     
       default:
         console.log('default!');
         response = { resp: 'Hello Back' };
+        ws.send(JSON.stringify(response));
         break;
     }
 
 
-    wss.clients.forEach(function each(client) {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(response));
-      }
-    })
+    // wss.clients.forEach(function each(client) {
+    //   if (client.readyState === WebSocket.OPEN) {
+    //     client.send(JSON.stringify(response));
+    //   }
+    // });
   })
 
 });
