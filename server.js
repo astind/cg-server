@@ -1,6 +1,8 @@
 const WebSocket = require("ws");
 const http = require('http');
-const cg = require('./build/cg-server');
+const cg = require('./build/cg-module');
+const { v4: uuidv4 } = require('uuid');
+
 const server = http.createServer();
 
 const wss = new WebSocket.Server({ server });
@@ -8,7 +10,11 @@ const wss = new WebSocket.Server({ server });
 var gameServer = cg.cgServer();
 
 wss.on('connection', function connection(ws) {
-  console.log('connected');
+
+  const connId = uuidv4();
+  console.log(`connection: ${connId}`);
+  ws.send(JSON.stringify({ resp: 'connected', id: connId }));
+
   ws.on('message', function incoming(data) {
 
     var msg = JSON.parse(data);
@@ -25,8 +31,15 @@ wss.on('connection', function connection(ws) {
 
       case "joinGame":
         console.log('join game');
-        response = gameServer.joinGame(msg.gameId, msg.playerName, ws);
+        var existingPlayers = gameServer.getClients(msg.gameId);
+        response = gameServer.joinGame(msg.gameId, msg.playerId, msg.playerName);
         ws.send(JSON.stringify(response));
+        if (response.added === true && existingPlayers.length > 0) {
+          for (const conn of existingPlayers) {
+            conn.send(JSON.stringify({ resp: 'addPlayer', player: { id: msg.playerId, name: msg.playerName } }));
+          }
+        }
+        gameServer.addClientToGame(msg.gameId, ws);
         break;
     
       default:

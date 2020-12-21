@@ -16,32 +16,31 @@ var Game = /** @class */ (function () {
     };
     Game.prototype.cleanRound = function () {
     };
-    Game.prototype.genPlayerId = function () {
-        return "p-" + this.players.length;
-    };
     Game.prototype.getPlayers = function () {
-        var playerList = [];
-        for (var _i = 0, _a = this.players; _i < _a.length; _i++) {
-            var p = _a[_i];
-            playerList.push({
-                name: p.name, id: p.id
-            });
-        }
-        return playerList;
+        return this.players.map(function (player) { return { id: player.id, name: player.name }; });
     };
-    Game.prototype.addPlayer = function (playerName, playerId) {
-        if (this.players.length < 6) {
-            if (!playerId) {
-                playerId = this.genPlayerId();
+    Game.prototype.addPlayer = function (playerId, playerName) {
+        // check if player already exists in game
+        if (this.players.every(function (player) { return player.id !== playerId; })) {
+            // check if the game is full
+            if (this.players.length >= 6) {
+                // full 
+                return false;
             }
-            this.players.push(new player_1.Player(playerName, playerId));
-            if (this.players.length === 1) {
-                this.hostId = playerId;
+            else {
+                // add to game
+                this.players.push(new player_1.Player(playerId, playerName));
+                // mark as host if first player in
+                if (this.players.length === 1) {
+                    this.hostId = playerId;
+                }
+                return true;
             }
-            return true;
         }
         else {
-            return false;
+            console.log("player: " + playerName + ", is already in the game");
+            // return some kind of game stat info to the player??
+            return true;
         }
     };
     Game.prototype.getHostId = function () {

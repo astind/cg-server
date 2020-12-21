@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Player = void 0;
 var deck_1 = require("./deck");
 var Player = /** @class */ (function () {
-    function Player(name, id) {
+    function Player(id, name) {
         this.score = 0;
         this.handCount = 0;
         this.name = name;

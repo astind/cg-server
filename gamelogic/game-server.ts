@@ -23,22 +23,28 @@ export class GameServer {
     return id;
   }
 
-  public joinGame(gameid: string, playerName: string, client: any): object {
-    let game: Game = this.games[gameid];
+  public joinGame(gameId: string, playerId: string, playerName: string): object {
+    let game: Game = this.games[gameId];
     if (game) {
-      let added = game.addPlayer(playerName);
+      // try to add to game
+      let added = game.addPlayer(playerId, playerName);
       if (added) {
-        if (this.clients[gameid]) {
-          this.clients[gameid].push(client);
-        } else {
-          this.clients[gameid] = [client];
-        }
+        // add new player to list of clients for game
+        
         return { resp: 'joinGame', added: true, players: game.getPlayers() };
       } else {
         return { resp: 'joinGame', added: false, reason: 'full'};
       }
     }
     return { resp: 'joinGame', added: false, reason: 'not-found'};
+  }
+
+  public addClientToGame(gameId: string, client: any) {
+    if (this.clients[gameId]) {
+      this.clients[gameId].push(client);
+    } else {
+      this.clients[gameId] = [client];
+    }
   }
 
   public getClients(gameid: string) {

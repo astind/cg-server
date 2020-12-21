@@ -17,17 +17,13 @@ var GameServer = /** @class */ (function () {
         this.gameCounter += 1;
         return id;
     };
-    GameServer.prototype.joinGame = function (gameid, playerName, client) {
-        var game = this.games[gameid];
+    GameServer.prototype.joinGame = function (gameId, playerId, playerName) {
+        var game = this.games[gameId];
         if (game) {
-            var added = game.addPlayer(playerName);
+            // try to add to game
+            var added = game.addPlayer(playerId, playerName);
             if (added) {
-                if (this.clients[gameid]) {
-                    this.clients[gameid].push(client);
-                }
-                else {
-                    this.clients[gameid] = [client];
-                }
+                // add new player to list of clients for game
                 return { resp: 'joinGame', added: true, players: game.getPlayers() };
             }
             else {
@@ -35,6 +31,14 @@ var GameServer = /** @class */ (function () {
             }
         }
         return { resp: 'joinGame', added: false, reason: 'not-found' };
+    };
+    GameServer.prototype.addClientToGame = function (gameId, client) {
+        if (this.clients[gameId]) {
+            this.clients[gameId].push(client);
+        }
+        else {
+            this.clients[gameId] = [client];
+        }
     };
     GameServer.prototype.getClients = function (gameid) {
         if (this.clients[gameid]) {

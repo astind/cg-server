@@ -9,7 +9,7 @@ export class Player {
   hand: Deck;
   id: string;
 
-  constructor(name: string, id: string) {
+  constructor(id: string, name: string) {
     this.name = name;
     this.id = id;
     this.hand = new Deck();

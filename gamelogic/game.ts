@@ -28,33 +28,32 @@ export class Game {
 
   }
 
-  genPlayerId() {
-    return "p-" + this.players.length;
-  }
-
   getPlayers() {
-    let playerList = [];
-    for (const p of this.players) {
-      playerList.push({
-        name: p.name, id: p.id
-      });
-    }
-    return playerList; 
+    return this.players.map( (player) => { return {id: player.id, name: player.name } });
   }
 
-  addPlayer(playerName: string, playerId?: string): boolean {
-    if (this.players.length < 6) {
-      if (!playerId) {
-        playerId = this.genPlayerId();
+  addPlayer(playerId: string, playerName: string, ): boolean {
+    // check if player already exists in game
+    if (this.players.every( (player) => { return player.id !== playerId })) {
+      // check if the game is full
+      if (this.players.length >= 6) {
+        // full 
+        return false;
+      } else {
+        // add to game
+        this.players.push(new Player(playerId, playerName));
+        // mark as host if first player in
+        if (this.players.length === 1) {
+          this.hostId = playerId;
+        }
+        return true;
       }
-      this.players.push(new Player(playerName, playerId));
-      if (this.players.length === 1) {
-        this.hostId = playerId;
-      }
-      return true;
     } else {
-      return false;
+      console.log(`player: ${playerName}, is already in the game`);
+      // return some kind of game stat info to the player??
+      return true
     }
+    
   }
 
   getHostId(): string | null {
